@@ -95,12 +95,12 @@
 }
 
 .table_de_proveedores td form {
-  display: inline-block; 
+  display: inline-block;
 }
 
 .table_de_proveedores td form button {
   padding: 8px 16px;
-  background-color: #BAF4B1;
+  background-color: #baf4b1;
   color: black;
   border: none;
   border-radius: 5px;
@@ -109,7 +109,7 @@
 }
 
 .table_de_proveedores td form button:hover {
-  background-color:#7db175;
+  background-color: #7db175;
 }
 
 .table_de_proveedores td form button:focus {
@@ -119,10 +119,10 @@
 
 @media (prefers-color-scheme: dark) {
   body.dark .table_de_proveedores td form button {
-    background-color: #BAF4B1;
+    background-color: #baf4b1;
   }
 
   body.dark .table_de_proveedores td form button:hover {
-    background-color:#7db175;
+    background-color: #7db175;
   }
 }

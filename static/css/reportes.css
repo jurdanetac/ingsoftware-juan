@@ -16,7 +16,6 @@ h1.main-title {
   color: #333;
 }
 
-
 .cards-section {
   grid-template-columns: repeat(1, 1fr);
 }
@@ -61,7 +60,7 @@ h1.main-title {
 }
 
 #clientes-card {
-  background-color:  #f7e2be;
+  background-color: #f7e2be;
 }
 
 #proveedores-card {
@@ -73,7 +72,7 @@ h1.main-title {
 }
 
 #usuarios-card {
-  background-color: #dec7fa ;
+  background-color: #dec7fa;
 }
 
 #ventas-card {

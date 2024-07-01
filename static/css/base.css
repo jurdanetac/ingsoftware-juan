@@ -145,24 +145,21 @@ body.dark {
   }
 }
 
-
 .footer {
   background-color: #f8f9fa;
   color: #495057;
-  padding: 20px; 
-  text-align: center; 
+  padding: 20px;
+  text-align: center;
   position: fixed;
-  width: 100%; 
-  bottom: 0; 
+  width: 100%;
+  bottom: 0;
   left: 0;
-  border-top: 1px solid #dee2e6; 
+  border-top: 1px solid #dee2e6;
 }
 
 .footer p {
-  margin: 0; 
+  margin: 0;
 }
-
-
 
 /* Estilos alerta de actualizar */
 .alert {
@@ -195,7 +192,6 @@ body.dark {
   color: #512e5f;
 }
 
-
 .flash-messages {
   margin: 20px 0;
 }
@@ -208,21 +204,20 @@ body.dark {
 }
 
 .flash-message.success {
-  background-color: #BAF4B1; 
+  background-color: #baf4b1;
 }
 
 .flash-message.error {
-  background-color:#f8d7da;
+  background-color: #f8d7da;
 }
 
 .flash-message.warning {
-  background-color:#F7D682; 
+  background-color: #f7d682;
 }
 
 .flash-message.info {
-  background-color: #2196F3;
+  background-color: #2196f3;
 }
-
 
 /* Estilos alerta de eliminar */
 .alert-eliminar {

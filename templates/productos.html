@@ -1,24 +1,32 @@
 {% extends "base.html" %} {% block title %}Productos{% endblock %} {% block head
 %} {{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/productos.css') }}" />
-{% endblock %} {% block content %} {% include
-'sidebar.html' %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/productos.css') }}"
+/>
+{% endblock %} {% block content %} {% include 'sidebar.html' %}
 <main>
   <div class="container_productos">
     <h1>Productos</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
     <div class="flash-messages">
       {% for category, message in messages %}
       <div class="flash-message {{ category }}">{{ message }}</div>
       {% endfor %}
     </div>
-    {% endif %}
-    {% endwith %}
+    {% endif %} {% endwith %}
     <div class="container_productos_buscar">
-      <input type="text" placeholder="Buscar" id="buscar-producto" onkeyup="buscarProducto()" />
+      <input
+        type="text"
+        placeholder="Buscar"
+        id="buscar-producto"
+        onkeyup="buscarProducto()"
+      />
       <button onclick="mostrarFormulario()">Añadir producto</button>
-      <button class="Actualizar" onclick="abrirModalActualizar()">Actualizar</button>
+      <button class="Actualizar" onclick="abrirModalActualizar()">
+        Actualizar
+      </button>
 
       <button class="Eliminar" onclick="eliminarProductos()">Eliminar</button>
     </div>
@@ -39,7 +47,11 @@
           {% for producto in productos %}
           <tr>
             <td>
-              <input type="checkbox" class="producto-checkbox" data-id="{{ producto.id }}" />
+              <input
+                type="checkbox"
+                class="producto-checkbox"
+                data-id="{{ producto.id }}"
+              />
             </td>
             <td>{{ producto.id }}</td>
             <td>{{ producto.nombre }}</td>
@@ -58,20 +70,46 @@
     <div class="modal-content">
       <span class="close" onclick="cerrarFormulario()">&times;</span>
       <h2>Agregar Nuevo Producto</h2>
-      <form id="formulario" action="{{ url_for('productos') }}" method="POST" onsubmit="return validarFormulario()">
-
+      <form
+        id="formulario"
+        action="{{ url_for('productos') }}"
+        method="POST"
+        onsubmit="return validarFormulario()"
+      >
         <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" value="{{ request.form.nombre or '' }}" required
-          onkeydown="return validarNombre(event)" /><br />
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          value="{{ request.form.nombre or '' }}"
+          required
+          onkeydown="return validarNombre(event)"
+        /><br />
         <label for="fecha_de_vencimiento">Fecha de Vencimiento:</label>
-        <input type="date" id="fecha_de_vencimiento" name="fecha_de_vencimiento"
-          value="{{ request.form.fecha_de_vencimiento or '' }}" required /><br />
+        <input
+          type="date"
+          id="fecha_de_vencimiento"
+          name="fecha_de_vencimiento"
+          value="{{ request.form.fecha_de_vencimiento or '' }}"
+          required
+        /><br />
         <label for="cantidad_disponible">Cantidad Disponible:</label>
-        <input type="number" id="cantidad_disponible" name="cantidad_disponible"
-          value="{{ request.form.cantidad_disponible or '' }}" required /><br />
+        <input
+          type="number"
+          id="cantidad_disponible"
+          name="cantidad_disponible"
+          value="{{ request.form.cantidad_disponible or '' }}"
+          required
+        /><br />
         <label for="precio_en_dolares">Precio ($):</label>
-        <input type="text" id="precio_en_dolares" name="precio_en_dolares"
-          value="{{ request.form.precio_en_dolares or '' }}" required onkeydown="return validarNumero(event)" /><br />
+        <input
+          type="text"
+          id="precio_en_dolares"
+          name="precio_en_dolares"
+          value="{{ request.form.precio_en_dolares or '' }}"
+          required
+          onkeydown="return validarNumero(event)"
+        /><br />
 
         {% if error_messages %}
         <div class="error-messages">
@@ -91,51 +129,116 @@
     <div class="modal-content">
       <span class="close" onclick="cerrarModalActualizar()">&times;</span>
       <h2>Actualizar Producto</h2>
-      <form id="formulario-actualizar" action="{{ url_for('actualizar_producto') }}" method="POST">
-        <input type="hidden" id="producto_id_actualizar" name="producto_id_actualizar" />
+      <form
+        id="formulario-actualizar"
+        action="{{ url_for('actualizar_producto') }}"
+        method="POST"
+      >
+        <input
+          type="hidden"
+          id="producto_id_actualizar"
+          name="producto_id_actualizar"
+        />
         <label for="nombre_actualizar">Nombre:</label>
-        <input type="text" id="nombre_actualizar" name="nombre_actualizar" required
-          onkeydown="return validarNombre(event)" /><br />
-        <label for="fecha_de_vencimiento_actualizar">Fecha de Vencimiento:</label>
-        <input type="date" id="fecha_de_vencimiento_actualizar" name="fecha_de_vencimiento_actualizar" required /><br />
+        <input
+          type="text"
+          id="nombre_actualizar"
+          name="nombre_actualizar"
+          required
+          onkeydown="return validarNombre(event)"
+        /><br />
+        <label for="fecha_de_vencimiento_actualizar"
+          >Fecha de Vencimiento:</label
+        >
+        <input
+          type="date"
+          id="fecha_de_vencimiento_actualizar"
+          name="fecha_de_vencimiento_actualizar"
+          required
+        /><br />
         <label for="cantidad_disponible_actualizar">Cantidad Disponible:</label>
-        <input type="number" id="cantidad_disponible_actualizar" name="cantidad_disponible_actualizar" required /><br />
+        <input
+          type="number"
+          id="cantidad_disponible_actualizar"
+          name="cantidad_disponible_actualizar"
+          required
+        /><br />
         <label for="precio_en_dolares_actualizar">Precio ($):</label>
-        <input type="text" id="precio_en_dolares_actualizar" name="precio_en_dolares_actualizar" required
-          onkeydown="return validarNumero(event)" /><br />
+        <input
+          type="text"
+          id="precio_en_dolares_actualizar"
+          name="precio_en_dolares_actualizar"
+          required
+          onkeydown="return validarNumero(event)"
+        /><br />
 
         <button type="submit">Actualizar</button>
       </form>
     </div>
   </div>
 
-  <div id="alerta" class="alert alert-primary d-flex align-items-center" role="alert">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-      class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+  <div
+    id="alerta"
+    class="alert alert-primary d-flex align-items-center"
+    role="alert"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="currentColor"
+      class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
+      viewBox="0 0 16 16"
+      role="img"
+      aria-label="Warning:"
+    >
       <path
-        d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+        d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
+      />
     </svg>
     <div id="alerta-mensaje">Debe seleccionar un producto para actualizar.</div>
-    <button type="button" class="btn-close" aria-label="Close" onclick="cerrarAlerta()"></button>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      onclick="cerrarAlerta()"
+    ></button>
   </div>
 
-  <div id="alerta-eliminar" class="alert alert-eliminar d-flex align-items-center" role="alert">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-      class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+  <div
+    id="alerta-eliminar"
+    class="alert alert-eliminar d-flex align-items-center"
+    role="alert"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="currentColor"
+      class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
+      viewBox="0 0 16 16"
+      role="img"
+      aria-label="Warning:"
+    >
       <path
-        d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+        d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
+      />
     </svg>
     <div id="alerta-mensaje-eliminar">
       Debe seleccionar al menos un producto para eliminar.
     </div>
-    <button type="button" class="btn-close" aria-label="Close" onclick="cerrarAlertaEliminar()"></button>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      onclick="cerrarAlertaEliminar()"
+    ></button>
   </div>
 </main>
 {% endblock %} {% block scripts %}
 
 <script src="{{ url_for('static', filename='js/component.js') }}"></script>
 <script>
-
   function validarNumero(event) {
     // Permitir: backspace, delete, tab, escape, enter y .
     if (
@@ -189,8 +292,8 @@
 
   function mostrarFormulario() {
     limpiarCampos(); // Limpia los campos del formulario
-    const modal = document.getElementById('modal');
-    modal.style.display = 'block';
+    const modal = document.getElementById("modal");
+    modal.style.display = "block";
   }
 
   function cerrarFormulario() {
@@ -246,7 +349,7 @@
 
   function abrirModalActualizar() {
     const filaSeleccionada = document.querySelector(
-      "input.producto-checkbox:checked"
+      "input.producto-checkbox:checked",
     );
 
     if (!filaSeleccionada) {
@@ -276,7 +379,6 @@
   function cerrarModalActualizar() {
     document.getElementById("modal-actualizar").style.display = "none";
   }
-
 
   function buscarProducto() {
     var input, filter, table, tbody, tr, td, i, txtValue;

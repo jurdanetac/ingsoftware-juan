@@ -1,80 +1,78 @@
 {% extends "base.html" %} {% block title %}Reportes{% endblock %} {% block head
-  %} {{ super() }}
-  <link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/reportes.css') }}"
-  />
-  <link
-    rel="shortcut icon"
-    href="{{ url_for('static', filename='favicon.ico') }}"
-  />
-  {% endblock %} {% block content %} {% include
-  'sidebar.html' %}
-  <main class="container">
-    <h1 class="main-title">Reportes</h1>
-    <div class="grid cards-section">
-      
-      <div class="card" id="productos-card">
-        <h2>Productos</h2>
-        <button
-          class="imprimir-btn"
-          onclick="window.location.href = '{{ url_for('productos_reporte') }}'"
-        >
-          Imprimir reporte
-        </button>
-      </div>
-  
-      <div class="card" id="clientes-card">
-        <h2>Clientes</h2>
-        <button
-          class="imprimir-btn"
-          onclick="window.location.href = '{{ url_for('clientes_reporte') }}'"
-        >
-          Imprimir reporte
-        </button>
-      </div>
-  
-      <div class="card" id="proveedores-card">
-        <h2>Proveedores</h2>
-        <button
-          class="imprimir-btn"
-          onclick="window.location.href = '{{ url_for('proveedores_reporte') }}'"
-        >
-          Imprimir reporte
-        </button>
-      </div>
-  
-      <div class="card" id="transacciones-card">
-        <h2>Compras</h2>
-        <button
-          class="imprimir-btn"
-          onclick="window.location.href = '{{ url_for('compras_reporte') }}'"
-        >
-          Imprimir reporte
-        </button>
-      </div>
-  
-      <div class="card" id="usuarios-card">
-        <h2>Usuarios</h2>
-        <button
-          class="imprimir-btn"
-          onclick="window.location.href = '{{ url_for('usuarios_reporte') }}'"
-        >
-          Imprimir reporte
-        </button>
-      </div>
-  
-      <div class="card" id="ventas-card">
-        <h2>Ventas</h2>
-        <button
-          class="imprimir-btn"
-          onclick="window.location.href = '{{ url_for('ventas_reporte') }}'"
-        >
-          Imprimir reporte
-        </button>
-      </div>
+%} {{ super() }}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/reportes.css') }}"
+/>
+<link
+  rel="shortcut icon"
+  href="{{ url_for('static', filename='favicon.ico') }}"
+/>
+{% endblock %} {% block content %} {% include 'sidebar.html' %}
+<main class="container">
+  <h1 class="main-title">Reportes</h1>
+  <div class="grid cards-section">
+    <div class="card" id="productos-card">
+      <h2>Productos</h2>
+      <button
+        class="imprimir-btn"
+        onclick="window.location.href = '{{ url_for('productos_reporte') }}'"
+      >
+        Imprimir reporte
+      </button>
     </div>
-  </main>
-  {% endblock %} {% block scripts %}
-  <script src="{{ url_for('static', filename='js/component.js') }}"></script>
-  {% endblock %}
+
+    <div class="card" id="clientes-card">
+      <h2>Clientes</h2>
+      <button
+        class="imprimir-btn"
+        onclick="window.location.href = '{{ url_for('clientes_reporte') }}'"
+      >
+        Imprimir reporte
+      </button>
+    </div>
+
+    <div class="card" id="proveedores-card">
+      <h2>Proveedores</h2>
+      <button
+        class="imprimir-btn"
+        onclick="window.location.href = '{{ url_for('proveedores_reporte') }}'"
+      >
+        Imprimir reporte
+      </button>
+    </div>
+
+    <div class="card" id="transacciones-card">
+      <h2>Compras</h2>
+      <button
+        class="imprimir-btn"
+        onclick="window.location.href = '{{ url_for('compras_reporte') }}'"
+      >
+        Imprimir reporte
+      </button>
+    </div>
+
+    <div class="card" id="usuarios-card">
+      <h2>Usuarios</h2>
+      <button
+        class="imprimir-btn"
+        onclick="window.location.href = '{{ url_for('usuarios_reporte') }}'"
+      >
+        Imprimir reporte
+      </button>
+    </div>
+
+    <div class="card" id="ventas-card">
+      <h2>Ventas</h2>
+      <button
+        class="imprimir-btn"
+        onclick="window.location.href = '{{ url_for('ventas_reporte') }}'"
+      >
+        Imprimir reporte
+      </button>
+    </div>
+  </div>
+</main>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/component.js') }}"></script>
+{% endblock %}

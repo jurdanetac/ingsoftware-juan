@@ -1,327 +1,424 @@
 {% extends "base.html" %} {% block title %}Proveedores{% endblock %} {% block
-  head %} {{ super() }}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Clientes.css') }}" />
-  {% endblock %} {% block content %} {% include
-  'sidebar.html' %}
-  <main>
-    <div class="container_clientes">
-      <h1>Proveedores</h1>
-      {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-      <div class="flash-messages">
-        {% for category, message in messages %}
-        <div class="flash-message {{ category }}">{{ message }}</div>
+head %} {{ super() }}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/Clientes.css') }}"
+/>
+{% endblock %} {% block content %} {% include 'sidebar.html' %}
+<main>
+  <div class="container_clientes">
+    <h1>Proveedores</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="flash-messages">
+      {% for category, message in messages %}
+      <div class="flash-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+    <div class="container_clientes_buscar">
+      <input
+        type="text"
+        placeholder="Buscar"
+        oninput="filtrarProveedores(this.value)"
+      />
+      <button onclick="mostrarFormulario()">Añadir proveedor</button>
+      <a href="{{ url_for('realizar_compra') }}">
+        <button class="Realizar_venta">Realizar compra</button>
+      </a>
+      <button class="Actualizar" onclick="abrirModalActualizar()">
+        Actualizar
+      </button>
+      <button class="Eliminar" onclick="eliminarProveedores()">Eliminar</button>
+    </div>
+    <div class="clientes">
+      <table class="table_de_clientes">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="select-all" /></th>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Dirección</th>
+            <th>RIF</th>
+          </tr>
+        </thead>
+        <tbody id="proveedores-table-body">
+          {% for proveedor in proveedores %}
+          <tr>
+            <td>
+              <input
+                type="checkbox"
+                class="proveedor-checkbox"
+                data-id="{{ proveedor.id }}"
+              />
+            </td>
+            <td>{{ proveedor.id }}</td>
+            <td>{{ proveedor.nombre }}</td>
+            <td>{{ proveedor.direccion }}</td>
+            <td>{{ proveedor.rif }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div
+    id="alerta"
+    class="alert alert-primary d-flex align-items-center"
+    role="alert"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="currentColor"
+      class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
+      viewBox="0 0 16 16"
+      role="img"
+      aria-label="Warning:"
+    >
+      <path
+        d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
+      />
+    </svg>
+    <div id="alerta-mensaje">
+      Debe seleccionar un proveedor para actualizar.
+    </div>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      onclick="cerrarAlerta()"
+    ></button>
+  </div>
+
+  <div
+    id="alerta-eliminar"
+    class="alert alert-eliminar d-flex align-items-center"
+    role="alert"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="currentColor"
+      class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
+      viewBox="0 0 16 16"
+      role="img"
+      aria-label="Warning:"
+    >
+      <path
+        d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
+      />
+    </svg>
+    <div id="alerta-mensaje-eliminar">
+      Debe seleccionar al menos un proveedor para eliminar.
+    </div>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      onclick="cerrarAlertaEliminar()"
+    ></button>
+  </div>
+</main>
+
+<!-- Ventana emergente para agregar un nuevo proveedor -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="cerrarFormulario()">&times;</span>
+    <h2>Agregar Nuevo Proveedor</h2>
+    <form id="formulario" action="{{ url_for('proveedores') }}" method="POST">
+      <label for="nombre">Nombre:</label>
+      <input
+        type="text"
+        id="nombre"
+        name="nombre"
+        value="{{ request.form.nombre or '' }}"
+        required
+        onkeydown="return validarNombre(event)"
+      /><br />
+      <label for="direccion">Dirección:</label>
+      <input
+        type="text"
+        id="direccion"
+        name="direccion"
+        value="{{ request.form.direccion or '' }}"
+        required
+      /><br />
+      <label for="rif">RIF:</label>
+      <input
+        type="text"
+        id="rif"
+        name="rif"
+        value="{{ request.form.rif or '' }}"
+        required
+        placeholder="Ej. J123456789"
+        onkeydown="return validarRIF(event)"
+      />
+
+      {% if error_messages %}
+      <div class="error-messages">
+        {% for message in error_messages %}
+        <div class="error-message">{{ message }}</div>
         {% endfor %}
       </div>
       {% endif %}
-      {% endwith %}
-      <div class="container_clientes_buscar">
-        <input type="text" placeholder="Buscar" oninput="filtrarProveedores(this.value)" />
-        <button onclick="mostrarFormulario()">Añadir proveedor</button>
-        <a href="{{ url_for('realizar_compra') }}">
-          <button class="Realizar_venta">Realizar compra</button>
-        </a>
-        <button class="Actualizar" onclick="abrirModalActualizar()">
-          Actualizar
-        </button>
-        <button class="Eliminar" onclick="eliminarProveedores()">Eliminar</button>
-      </div>
-      <div class="clientes">
-        <table class="table_de_clientes">
-          <thead>
-            <tr>
-              <th><input type="checkbox" id="select-all" /></th>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Dirección</th>
-              <th>RIF</th>
-            </tr>
-          </thead>
-          <tbody id="proveedores-table-body">
-            {% for proveedor in proveedores %}
-            <tr>
-              <td>
-                <input type="checkbox" class="proveedor-checkbox" data-id="{{ proveedor.id }}" />
-              </td>
-              <td>{{ proveedor.id }}</td>
-              <td>{{ proveedor.nombre }}</td>
-              <td>{{ proveedor.direccion }}</td>
-              <td>{{ proveedor.rif }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  
-    <div id="alerta" class="alert alert-primary d-flex align-items-center" role="alert">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-        class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
-        <path
-          d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-      </svg>
-      <div id="alerta-mensaje">
-        Debe seleccionar un proveedor para actualizar.
-      </div>
-      <button type="button" class="btn-close" aria-label="Close" onclick="cerrarAlerta()"></button>
-    </div>
-  
-    <div id="alerta-eliminar" class="alert alert-eliminar d-flex align-items-center" role="alert">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-        class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
-        <path
-          d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-      </svg>
-      <div id="alerta-mensaje-eliminar">
-        Debe seleccionar al menos un proveedor para eliminar.
-      </div>
-      <button type="button" class="btn-close" aria-label="Close" onclick="cerrarAlertaEliminar()"></button>
-    </div>
-  </main>
-  
-  <!-- Ventana emergente para agregar un nuevo proveedor -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="cerrarFormulario()">&times;</span>
-      <h2>Agregar Nuevo Proveedor</h2>
-      <form id="formulario" action="{{ url_for('proveedores') }}" method="POST">
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" value="{{ request.form.nombre or '' }}" required onkeydown="return validarNombre(event)" /><br />
-        <label for="direccion">Dirección:</label>
-        <input type="text" id="direccion" name="direccion" value="{{ request.form.direccion or '' }}" required /><br />
-        <label for="rif">RIF:</label>
-        <input type="text" id="rif" name="rif" value="{{ request.form.rif or '' }}" required placeholder="Ej. J123456789" onkeydown="return validarRIF(event)" />
 
-        {% if error_messages %}
-        <div class="error-messages">
-          {% for message in error_messages %}
-          <div class="error-message">{{ message }}</div>
-          {% endfor %}
-        </div>
-        {% endif %}
-  
-        <input type="submit" value="Agregar" />
-      </form>
-    </div>
+      <input type="submit" value="Agregar" />
+    </form>
   </div>
-  
-  
-  <div id="modal-actualizar" class="modal" style="display: none">
-    <div class="modal-content">
-      <span class="close" onclick="cerrarModalActualizar()">&times;</span>
-      <h2>Actualizar Proveedor</h2>
-      <form id="formulario-actualizar" method="POST" action="{{ url_for('actualizar_proveedor') }}">
-        <input type="hidden" id="proveedor_id_actualizar" name="proveedor_id_actualizar" />
-        <label for="nombre_actualizar">Nombre:</label>
-        <input type="text" id="nombre_actualizar" name="nombre_actualizar" required onkeydown="return validarNombre(event)" /><br />
-        <label for="direccion_actualizar">Dirección:</label>
-        <input type="text" id="direccion_actualizar" name="direccion_actualizar" required /><br />
-        <label for="rif_actualizar">RIF:</label>
-        <input type="text" id="rif_actualizar" name="rif_actualizar" required placeholder="Ej. J123456789" onkeydown="return validarRIF(event)"  /><br />
-        <button type="submit">Actualizar</button>
-      </form>
-    </div>
+</div>
+
+<div id="modal-actualizar" class="modal" style="display: none">
+  <div class="modal-content">
+    <span class="close" onclick="cerrarModalActualizar()">&times;</span>
+    <h2>Actualizar Proveedor</h2>
+    <form
+      id="formulario-actualizar"
+      method="POST"
+      action="{{ url_for('actualizar_proveedor') }}"
+    >
+      <input
+        type="hidden"
+        id="proveedor_id_actualizar"
+        name="proveedor_id_actualizar"
+      />
+      <label for="nombre_actualizar">Nombre:</label>
+      <input
+        type="text"
+        id="nombre_actualizar"
+        name="nombre_actualizar"
+        required
+        onkeydown="return validarNombre(event)"
+      /><br />
+      <label for="direccion_actualizar">Dirección:</label>
+      <input
+        type="text"
+        id="direccion_actualizar"
+        name="direccion_actualizar"
+        required
+      /><br />
+      <label for="rif_actualizar">RIF:</label>
+      <input
+        type="text"
+        id="rif_actualizar"
+        name="rif_actualizar"
+        required
+        placeholder="Ej. J123456789"
+        onkeydown="return validarRIF(event)"
+      /><br />
+      <button type="submit">Actualizar</button>
+    </form>
   </div>
-  
-  {% endblock %} {% block scripts %}
-  <script src="{{ url_for('static', filename='js/component.js') }}"></script>
-  <script>
-    function validarRIF(event) {
-  // Permitir: backspace, delete, tab, escape, enter y J
-  if (
-    ["Backspace", "Delete", "Tab", "Escape", "Enter", "J"].indexOf(event.key) !== -1 ||
-    ((event.ctrlKey || event.metaKey) && ["a", "c", "v", "x"].indexOf(event.key) !== -1) ||
-    // Permitir: numeros del 0 al 9
-    (event.key >= "0" && event.key <= "9")
-  ) {
-    // Solo permitir un J al inicio
-    if (event.key === "J" && event.target.value !== "") {
+</div>
+
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/component.js') }}"></script>
+<script>
+  function validarRIF(event) {
+    // Permitir: backspace, delete, tab, escape, enter y J
+    if (
+      ["Backspace", "Delete", "Tab", "Escape", "Enter", "J"].indexOf(
+        event.key,
+      ) !== -1 ||
+      ((event.ctrlKey || event.metaKey) &&
+        ["a", "c", "v", "x"].indexOf(event.key) !== -1) ||
+      // Permitir: numeros del 0 al 9
+      (event.key >= "0" && event.key <= "9")
+    ) {
+      // Solo permitir un J al inicio
+      if (event.key === "J" && event.target.value !== "") {
+        event.preventDefault();
+        return false;
+      }
+      // Permitir solo números después de J
+      if (
+        event.target.value.startsWith("J") &&
+        !(event.key >= "0" && event.key <= "9")
+      ) {
+        event.preventDefault();
+        return false;
+      }
+    } else {
       event.preventDefault();
       return false;
     }
-    // Permitir solo números después de J
-    if (event.target.value.startsWith("J") && !(event.key >= "0" && event.key <= "9")) {
-      event.preventDefault();
-      return false;
-    }
-  } else {
-    event.preventDefault();
-    return false;
-  }
-  return true;
-}
-  
-function validarNombre(event) {
-  // Permitir solo letras y espacios
-  if (
-    (event.key >= "a" && event.key <= "z") ||
-    (event.key >= "A" && event.key <= "Z") ||
-    event.key === " "
-  ) {
     return true;
-  } else {
-    event.preventDefault();
-    return false;
   }
-}
-  
-    function mostrarFormulario() {
-      document.getElementById("modal").style.display = "block";
+
+  function validarNombre(event) {
+    // Permitir solo letras y espacios
+    if (
+      (event.key >= "a" && event.key <= "z") ||
+      (event.key >= "A" && event.key <= "Z") ||
+      event.key === " "
+    ) {
+      return true;
+    } else {
+      event.preventDefault();
+      return false;
     }
-  
-    function cerrarFormulario() {
-      document.getElementById("modal").style.display = "none";
-      limpiarCampos();
+  }
+
+  function mostrarFormulario() {
+    document.getElementById("modal").style.display = "block";
+  }
+
+  function cerrarFormulario() {
+    document.getElementById("modal").style.display = "none";
+    limpiarCampos();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const errorMessages = document.querySelectorAll(".error-message");
+    if (errorMessages.length > 0) {
+      mostrarFormulario();
     }
-  
-    document.addEventListener("DOMContentLoaded", function () {
-      const errorMessages = document.querySelectorAll(".error-message");
-      if (errorMessages.length > 0) {
-        mostrarFormulario();
+  });
+
+  function limpiarCampos() {
+    document.getElementById("formulario").reset();
+  }
+
+  function eliminarProveedores() {
+    const proveedoresSeleccionados = obtenerProveedoresSeleccionados();
+    if (proveedoresSeleccionados.length === 0) {
+      mostrarAlertaEliminar(
+        "Debe seleccionar al menos un proveedor para eliminar.",
+      );
+      return;
+    }
+
+    const confirmacion = confirm(
+      "¿Está seguro de que desea eliminar los proveedores seleccionados?",
+    );
+    if (!confirmacion) {
+      return;
+    }
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "{{ url_for('eliminar_proveedores') }}";
+
+    proveedoresSeleccionados.forEach((id) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "proveedor_ids";
+      input.value = id;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  const selectAllCheckbox = document.getElementById("select-all");
+  const checkboxes = document.querySelectorAll(".proveedor-checkbox");
+
+  selectAllCheckbox.addEventListener("change", function () {
+    checkboxes.forEach(function (checkbox) {
+      checkbox.checked = selectAllCheckbox.checked;
+    });
+  });
+
+  function abrirModalActualizar() {
+    const filaSeleccionada = document.querySelector(
+      "input.proveedor-checkbox:checked",
+    );
+
+    if (!filaSeleccionada) {
+      mostrarAlerta("Debe seleccionar un proveedor para actualizar.");
+      return;
+    }
+
+    const fila = filaSeleccionada.closest("tr");
+
+    const proveedorId = fila.cells[1].textContent;
+
+    document.getElementById("proveedor_id_actualizar").value = proveedorId;
+
+    const nombre = fila.cells[2].textContent;
+    const direccion = fila.cells[3].textContent;
+    const rif = fila.cells[4].textContent;
+
+    document.getElementById("nombre_actualizar").value = nombre;
+    document.getElementById("direccion_actualizar").value = direccion;
+    document.getElementById("rif_actualizar").value = rif;
+
+    document.getElementById("modal-actualizar").style.display = "block";
+  }
+
+  function cerrarModalActualizar() {
+    document.getElementById("modal-actualizar").style.display = "none";
+  }
+
+  function obtenerProveedoresSeleccionados() {
+    const checkboxes = document.querySelectorAll(".proveedor-checkbox:checked");
+    const ids = Array.from(checkboxes).map((checkbox) =>
+      checkbox.getAttribute("data-id"),
+    );
+    return ids;
+  }
+
+  function filtrarProveedores(valor) {
+    const filtro = valor.toLowerCase();
+    const filas = document.querySelectorAll("#proveedores-table-body tr");
+
+    filas.forEach((fila) => {
+      const nombre = fila.cells[2].textContent.toLowerCase();
+      const direccion = fila.cells[3].textContent.toLowerCase();
+      const rif = fila.cells[4].textContent.toLowerCase();
+      if (
+        nombre.includes(filtro) ||
+        direccion.includes(filtro) ||
+        rif.includes(filtro)
+      ) {
+        fila.style.display = "";
+      } else {
+        fila.style.display = "none";
       }
     });
-  
-    function limpiarCampos() {
-      document.getElementById("formulario").reset();
-    }
-  
-    function eliminarProveedores() {
-      const proveedoresSeleccionados = obtenerProveedoresSeleccionados();
-      if (proveedoresSeleccionados.length === 0) {
-        mostrarAlertaEliminar(
-          "Debe seleccionar al menos un proveedor para eliminar.",
-        );
-        return;
-      }
-  
-      const confirmacion = confirm(
-        "¿Está seguro de que desea eliminar los proveedores seleccionados?",
-      );
-      if (!confirmacion) {
-        return;
-      }
-  
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = "{{ url_for('eliminar_proveedores') }}";
-  
-      proveedoresSeleccionados.forEach((id) => {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "proveedor_ids";
-        input.value = id;
-        form.appendChild(input);
-      });
-  
-      document.body.appendChild(form);
-      form.submit();
-    }
-  
-    const selectAllCheckbox = document.getElementById("select-all");
-    const checkboxes = document.querySelectorAll(".proveedor-checkbox");
-  
-    selectAllCheckbox.addEventListener("change", function () {
-      checkboxes.forEach(function (checkbox) {
-        checkbox.checked = selectAllCheckbox.checked;
-      });
-    });
-  
-    function abrirModalActualizar() {
-      const filaSeleccionada = document.querySelector(
-        "input.proveedor-checkbox:checked",
-      );
-  
-      if (!filaSeleccionada) {
-        mostrarAlerta("Debe seleccionar un proveedor para actualizar.");
-        return;
-      }
-  
-      const fila = filaSeleccionada.closest("tr");
-  
-      const proveedorId = fila.cells[1].textContent;
-  
-      document.getElementById("proveedor_id_actualizar").value = proveedorId;
-  
-      const nombre = fila.cells[2].textContent;
-      const direccion = fila.cells[3].textContent;
-      const rif = fila.cells[4].textContent;
-  
-      document.getElementById("nombre_actualizar").value = nombre;
-      document.getElementById("direccion_actualizar").value = direccion;
-      document.getElementById("rif_actualizar").value = rif;
-  
-      document.getElementById("modal-actualizar").style.display = "block";
-    }
-  
-    function cerrarModalActualizar() {
-      document.getElementById("modal-actualizar").style.display = "none";
-    }
-  
-    function obtenerProveedoresSeleccionados() {
-      const checkboxes = document.querySelectorAll(".proveedor-checkbox:checked");
-      const ids = Array.from(checkboxes).map((checkbox) =>
-        checkbox.getAttribute("data-id"),
-      );
-      return ids;
-    }
-  
-    function filtrarProveedores(valor) {
-      const filtro = valor.toLowerCase();
-      const filas = document.querySelectorAll("#proveedores-table-body tr");
-  
-      filas.forEach((fila) => {
-        const nombre = fila.cells[2].textContent.toLowerCase();
-        const direccion = fila.cells[3].textContent.toLowerCase();
-        const rif = fila.cells[4].textContent.toLowerCase();
-        if (
-          nombre.includes(filtro) ||
-          direccion.includes(filtro) ||
-          rif.includes(filtro)
-        ) {
-          fila.style.display = "";
-        } else {
-          fila.style.display = "none";
-        }
-      });
-    }
-  
-    // Alertas
-    function mostrarAlerta(mensaje) {
-      const alerta = document.getElementById("alerta");
-      const alertaMensaje = document.getElementById("alerta-mensaje");
-      alertaMensaje.textContent = mensaje;
-      // Cerrar la alerta de eliminar si está abierta
-      cerrarAlertaEliminar();
-      alerta.classList.add("show");
-      setTimeout(() => {
-        alerta.classList.remove("show");
-      }, 5000);
-    }
-  
-    function cerrarAlerta() {
-      const alerta = document.getElementById("alerta");
+  }
+
+  // Alertas
+  function mostrarAlerta(mensaje) {
+    const alerta = document.getElementById("alerta");
+    const alertaMensaje = document.getElementById("alerta-mensaje");
+    alertaMensaje.textContent = mensaje;
+    // Cerrar la alerta de eliminar si está abierta
+    cerrarAlertaEliminar();
+    alerta.classList.add("show");
+    setTimeout(() => {
       alerta.classList.remove("show");
-    }
-  
-    function mostrarAlertaEliminar(mensaje) {
-      const alertaEliminar = document.getElementById("alerta-eliminar");
-      const alertaEliminarMensaje = document.getElementById(
-        "alerta-mensaje-eliminar",
-      );
-      alertaEliminarMensaje.textContent = mensaje;
-  
-      // Cerrar la alerta de actualizar si está abierta
-      cerrarAlerta();
-  
-      alertaEliminar.classList.add("show");
-      setTimeout(() => {
-        alertaEliminar.classList.remove("show");
-      }, 5000);
-    }
-  
-    function cerrarAlertaEliminar() {
-      const alertaEliminar = document.getElementById("alerta-eliminar");
+    }, 5000);
+  }
+
+  function cerrarAlerta() {
+    const alerta = document.getElementById("alerta");
+    alerta.classList.remove("show");
+  }
+
+  function mostrarAlertaEliminar(mensaje) {
+    const alertaEliminar = document.getElementById("alerta-eliminar");
+    const alertaEliminarMensaje = document.getElementById(
+      "alerta-mensaje-eliminar",
+    );
+    alertaEliminarMensaje.textContent = mensaje;
+
+    // Cerrar la alerta de actualizar si está abierta
+    cerrarAlerta();
+
+    alertaEliminar.classList.add("show");
+    setTimeout(() => {
       alertaEliminar.classList.remove("show");
-    }
-  </script>
-  {% endblock %}
+    }, 5000);
+  }
+
+  function cerrarAlertaEliminar() {
+    const alertaEliminar = document.getElementById("alerta-eliminar");
+    alertaEliminar.classList.remove("show");
+  }
+</script>
+{% endblock %}

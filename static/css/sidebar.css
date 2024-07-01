@@ -132,7 +132,8 @@ a.selector {
   left: -30px;
 }
 
-.icon__menu, .icon__configuracion {
+.icon__menu,
+.icon__configuracion {
   width: 50px;
   height: 100%;
   display: flex;
@@ -142,12 +143,14 @@ a.selector {
   position: relative;
 }
 
-.icon__menu img, .icon__configuracion img {
+.icon__menu img,
+.icon__configuracion img {
   cursor: pointer;
   position: absolute;
 }
 
-.icon__menu, .icon__configuracion {
+.icon__menu,
+.icon__configuracion {
   width: 50px;
   height: 100%;
   display: flex;
@@ -159,7 +162,9 @@ a.selector {
 
 .logout img {
   cursor: pointer;
-  transition: transform 0.3s, opacity 0.3s;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
 }
 
 .logout img:hover {

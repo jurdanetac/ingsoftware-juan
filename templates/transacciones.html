@@ -4,19 +4,32 @@ head %} {{ super() }}
   rel="stylesheet"
   href="{{ url_for('static', filename='css/transacciones.css') }}"
 />
-{% endblock %} {% block content %} {% include
-'sidebar.html' %}
+{% endblock %} {% block content %} {% include 'sidebar.html' %}
 <main>
   <div class="container_proveedores">
     <h1>Transacciones</h1>
     <div class="container_proveedores_buscar">
-      <input type="text" placeholder="Buscar" onkeyup="filtrarTransacciones(this.value)" />
+      <input
+        type="text"
+        placeholder="Buscar"
+        onkeyup="filtrarTransacciones(this.value)"
+      />
       <label for="fecha_inicio">Fecha Inicio:</label>
-      <input type="date" id="fecha_inicio" name="fecha_inicio" onchange="filtrarPorFecha()" />
+      <input
+        type="date"
+        id="fecha_inicio"
+        name="fecha_inicio"
+        onchange="filtrarPorFecha()"
+      />
       <label for="fecha_fin">Fecha Fin:</label>
-      <input type="date" id="fecha_fin" name="fecha_fin" onchange="filtrarPorFecha()" />
+      <input
+        type="date"
+        id="fecha_fin"
+        name="fecha_fin"
+        onchange="filtrarPorFecha()"
+      />
     </div>
-    
+
     <div class="proveedores">
       <table class="table_de_proveedores">
         <thead>
@@ -29,7 +42,8 @@ head %} {{ super() }}
             <th>Cliente</th>
             <th>Proveedor</th>
             <th>Realizada por</th>
-            <th>Acciones</th> <!-- Nueva columna para el botón de reporte -->
+            <th>Acciones</th>
+            <!-- Nueva columna para el botón de reporte -->
           </tr>
         </thead>
         <tbody>
@@ -40,7 +54,10 @@ head %} {{ super() }}
             <td>{{ transaccion.marca_de_tiempo }}</td>
             <td>{{ transaccion.importe_en_dolares }}</td>
             <td>{{ transaccion.tasa_bcv }}</td>
-            <td>{{ transaccion.importe_en_dolares * transaccion.tasa_bcv | round }}</td>
+            <td>
+              {{ transaccion.importe_en_dolares * transaccion.tasa_bcv | round
+              }}
+            </td>
             {% if transaccion.clientes_id %}
             <td>{{ transaccion.cliente }}</td>
             <td>N/A</td>
@@ -50,7 +67,10 @@ head %} {{ super() }}
             {% endif %}
             <td>{{ transaccion.usuario }}</td>
             <td>
-              <form action="{{ url_for('generar_reporte', transaccion_id=transaccion.id) }}" method="post">
+              <form
+                action="{{ url_for('generar_reporte', transaccion_id=transaccion.id) }}"
+                method="post"
+              >
                 <button type="submit" class="btn btn-primary">Reporte</button>
               </form>
             </td>
@@ -78,24 +98,23 @@ head %} {{ super() }}
   }
 
   function filtrarPorFecha() {
-  const fechaInicio = document.getElementById("fecha_inicio").value;
-  const fechaFin = document.getElementById("fecha_fin").value;
-  const filas = document.querySelectorAll(".table_de_proveedores tbody tr");
+    const fechaInicio = document.getElementById("fecha_inicio").value;
+    const fechaFin = document.getElementById("fecha_fin").value;
+    const filas = document.querySelectorAll(".table_de_proveedores tbody tr");
 
-  filas.forEach((fila) => {
-    const marcaTiempo = fila.querySelector("td:nth-child(2)").textContent;
-    const fechaTransaccion = new Date(marcaTiempo);
+    filas.forEach((fila) => {
+      const marcaTiempo = fila.querySelector("td:nth-child(2)").textContent;
+      const fechaTransaccion = new Date(marcaTiempo);
 
-    if (
-      (fechaInicio === "" || fechaTransaccion >= new Date(fechaInicio)) &&
-      (fechaFin === "" || fechaTransaccion <= new Date(fechaFin))
-    ) {
-      fila.style.display = "table-row";
-    } else {
-      fila.style.display = "none";
-    }
-  });
-}
-
+      if (
+        (fechaInicio === "" || fechaTransaccion >= new Date(fechaInicio)) &&
+        (fechaFin === "" || fechaTransaccion <= new Date(fechaFin))
+      ) {
+        fila.style.display = "table-row";
+      } else {
+        fila.style.display = "none";
+      }
+    });
+  }
 </script>
 {% endblock %}
